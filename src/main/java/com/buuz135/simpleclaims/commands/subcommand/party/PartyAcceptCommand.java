@@ -37,14 +37,14 @@ public class PartyAcceptCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
+                        var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
                         if (party != null) {
                             player.sendMessage(CommandMessages.IN_A_PARTY);
                             return;
                         }
-                        var invite = ClaimManager.getInstance().acceptInvite(player);
+                        var invite = ClaimManager.getInstance().acceptInvite(playerRef);
                         if (invite != null) {
                             var partyInvite = ClaimManager.getInstance().getPartyById(invite.party());
                             if (partyInvite != null) {

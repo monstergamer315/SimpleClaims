@@ -39,14 +39,14 @@ public class PartyLeaveCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
+                        var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
                         if (party == null) {
                             player.sendMessage(CommandMessages.NOT_IN_A_PARTY);
                             return;
                         }
-                        ClaimManager.getInstance().leaveParty(player, party);
+                        ClaimManager.getInstance().leaveParty(playerRef, party);
                     }
                 }, world);
             } else {

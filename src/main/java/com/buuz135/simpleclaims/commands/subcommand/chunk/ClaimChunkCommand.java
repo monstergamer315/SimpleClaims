@@ -31,22 +31,21 @@ public class ClaimChunkCommand extends AbstractAsyncCommand {
         CommandSender sender = commandContext.sender();
         if (sender instanceof Player player) {
             Ref<EntityStore> ref = player.getReference();
-            if (ref != null && ref.isValid()) {
+            PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+            if (ref != null && ref.isValid() && playerRef != null) {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        if (!ClaimManager.getInstance().canClaimInDimension(world)) {
+                    if (!ClaimManager.getInstance().canClaimInDimension(world)) {
                             player.sendMessage(CommandMessages.CANT_CLAIM_IN_THIS_DIMENSION);
                             return;
                         }
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
                         if (party == null) {
-                            party = ClaimManager.getInstance().createParty(player);
+                            party = ClaimManager.getInstance().createParty(player, playerRef);
                             player.sendMessage(CommandMessages.PARTY_CREATED);
                         }
-                        var chunk = ClaimManager.getInstance().getChunkRawCoords(player.getWorld().getName(), (int) player.getPosition().getX(), (int) player.getPosition().getZ());
+                    var chunk = ClaimManager.getInstance().getChunkRawCoords(player.getWorld().getName(), (int) playerRef.getTransform().getPosition().getX(), (int) playerRef.getTransform().getPosition().getZ());
                         if (chunk != null) {
                             player.sendMessage(chunk.getPartyOwner().equals(party.getId()) ? CommandMessages.ALREADY_CLAIMED_BY_YOU : CommandMessages.ALREADY_CLAIMED_BY_ANOTHER_PLAYER);
                             return;
@@ -55,9 +54,8 @@ public class ClaimChunkCommand extends AbstractAsyncCommand {
                             player.sendMessage(CommandMessages.NOT_ENOUGH_CHUNKS);
                             return;
                         }
-                        var chunkInfo = ClaimManager.getInstance().claimChunkByRawCoords(player.getWorld().getName(), (int) player.getPosition().getX(), (int) player.getPosition().getZ(), party, player);
+                    var chunkInfo = ClaimManager.getInstance().claimChunkByRawCoords(player.getWorld().getName(), (int) playerRef.getTransform().getPosition().getX(), (int) playerRef.getTransform().getPosition().getZ(), party, player, playerRef);
                         player.sendMessage(CommandMessages.CLAIMED);
-                    }
                 }, world);
             } else {
                 commandContext.sendMessage(MESSAGE_COMMANDS_ERRORS_PLAYER_NOT_IN_WORLD);

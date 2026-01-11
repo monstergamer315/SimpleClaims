@@ -55,14 +55,14 @@ public class SimpleClaimsPartyCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
+                        var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
                         if (party == null) {
                             commandContext.sendMessage(CommandMessages.NOT_IN_A_PARTY);
                             return;
                         }
-                        player.getPageManager().openCustomPage(ref, store, new PartyInfoEditGui(playerRefComponent, party, false));
+                        player.getPageManager().openCustomPage(ref, store, new PartyInfoEditGui(playerRef, party, false));
                     }
                 }, world);
             } else {

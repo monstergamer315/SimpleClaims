@@ -32,21 +32,19 @@ public class CreatePartyCommand extends AbstractAsyncCommand {
         CommandSender sender = commandContext.sender();
         if (sender instanceof Player player) {
             Ref<EntityStore> ref = player.getReference();
-            if (ref != null && ref.isValid()) {
+            PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+            if (ref != null && ref.isValid() && playerRef != null) {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
-                        if (party != null) {
-                            commandContext.sendMessage(CommandMessages.IN_A_PARTY);
-                            return;
-                        }
-                        party = ClaimManager.getInstance().createParty(player);
-                        player.sendMessage(CommandMessages.PARTY_CREATED);
-                        player.getPageManager().openCustomPage(ref, store, new PartyInfoEditGui(playerRefComponent, party, false));
+                    var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
+                    if (party != null) {
+                        commandContext.sendMessage(CommandMessages.IN_A_PARTY);
+                        return;
                     }
+                    party = ClaimManager.getInstance().createParty(player, playerRef);
+                    player.sendMessage(CommandMessages.PARTY_CREATED);
+                    player.getPageManager().openCustomPage(ref, store, new PartyInfoEditGui(playerRef, party, false));
                 }, world);
             } else {
                 commandContext.sendMessage(MESSAGE_COMMANDS_ERRORS_PLAYER_NOT_IN_WORLD);

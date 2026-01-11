@@ -12,6 +12,7 @@ import com.hypixel.hytale.codec.util.RawJsonReader;
 import com.hypixel.hytale.logger.HytaleLogger;
 import com.hypixel.hytale.math.util.ChunkUtil;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.util.BsonUtil;
 
@@ -150,9 +151,9 @@ public class ClaimManager {
         this.parties.put(partyInfo.getId().toString(), partyInfo);
     }
 
-    public boolean isAllowedToInteract(Player player, String dimension, int chunkX, int chunkZ, Predicate<PartyInfo> interactMethod){
+    public boolean isAllowedToInteract(UUID playerUUID, String dimension, int chunkX, int chunkZ, Predicate<PartyInfo> interactMethod) {
         // Admin Overrides ignores all the checks
-        if (adminClaimOverrides.contains(player.getUuid().toString())) return true;
+        if (adminClaimOverrides.contains(playerUUID.toString())) return true;
         // Check if the chunk is claimed and yf the chunk is not claimed return true
         var chunkInfo = getChunkRawCoords(dimension, chunkX, chunkZ);
         if (chunkInfo == null) return true;
@@ -162,16 +163,11 @@ public class ClaimManager {
         if (chunkParty == null || interactMethod.test(chunkParty)) return true;
 
         // Get the player party, if the player doesn't have a party then it can't be a member of the claimed chunk party
-        var partyFromPlayer = getPartyFromPlayer(player);
+        var partyFromPlayer = getPartyFromPlayer(playerUUID);
         if (partyFromPlayer == null) return false;
 
         // Check if its the same party
         return chunkInfo.getPartyOwner().equals(partyFromPlayer.getId());
-    }
-
-    @Nullable
-    public PartyInfo getPartyFromPlayer(Player player){
-        return this.parties.values().stream().filter(partyInfo -> partyInfo.isOwnerOrMember(player.getUuid())).findFirst().orElse(null);
     }
 
     @Nullable
@@ -184,11 +180,11 @@ public class ClaimManager {
         return this.parties.get(partyId.toString());
     }
 
-    public PartyInfo createParty(Player owner){
-        var party = new PartyInfo(UUID.randomUUID(), owner.getUuid(), owner.getDisplayName() + "'s Party", owner.getDisplayName() + "'s Party Description", new UUID[0], Color.getHSBColor(new Random().nextFloat(), 1, 1).getRGB());
-        party.addMember(owner.getUuid());
-        party.setCreatedTracked(new ModifiedTracking(owner.getUuid(), owner.getDisplayName(), LocalDateTime.now().toString()));
-        party.setModifiedTracked(new ModifiedTracking(owner.getUuid(), owner.getDisplayName(), LocalDateTime.now().toString()));
+    public PartyInfo createParty(Player owner, PlayerRef playerRef) {
+        var party = new PartyInfo(UUID.randomUUID(), playerRef.getUuid(), owner.getDisplayName() + "'s Party", owner.getDisplayName() + "'s Party Description", new UUID[0], Color.getHSBColor(new Random().nextFloat(), 1, 1).getRGB());
+        party.addMember(playerRef.getUuid());
+        party.setCreatedTracked(new ModifiedTracking(playerRef.getUuid(), owner.getDisplayName(), LocalDateTime.now().toString()));
+        party.setModifiedTracked(new ModifiedTracking(playerRef.getUuid(), owner.getDisplayName(), LocalDateTime.now().toString()));
         this.parties.put(party.getId().toString(), party);
         this.markDirty();
         return party;
@@ -212,17 +208,17 @@ public class ClaimManager {
         return this.getChunk(dimension, ChunkUtil.chunkCoordinate(blockX), ChunkUtil.chunkCoordinate(blockZ));
     }
 
-    public ChunkInfo claimChunkBy(String dimension, int chunkX, int chunkZ, PartyInfo partyInfo, Player owner){
+    public ChunkInfo claimChunkBy(String dimension, int chunkX, int chunkZ, PartyInfo partyInfo, Player owner, PlayerRef playerRef) {
         var chunkInfo = new ChunkInfo(partyInfo.getId(), chunkX, chunkZ);
         var chunkDimension = this.chunks.computeIfAbsent(dimension, k -> new HashMap<>());
         chunkDimension.put(ChunkInfo.formatCoordinates(chunkX, chunkZ), chunkInfo);
-        chunkInfo.setCreatedTracked(new ModifiedTracking(owner.getUuid(), owner.getDisplayName(), LocalDateTime.now().toString()));
+        chunkInfo.setCreatedTracked(new ModifiedTracking(playerRef.getUuid(), owner.getDisplayName(), LocalDateTime.now().toString()));
         this.markDirty();
         return chunkInfo;
     }
 
-    public ChunkInfo claimChunkByRawCoords(String dimension, int blockX, int blockZ, PartyInfo partyInfo, Player owner){
-        return this.claimChunkBy(dimension, ChunkUtil.chunkCoordinate(blockX), ChunkUtil.chunkCoordinate(blockZ), partyInfo, owner);
+    public ChunkInfo claimChunkByRawCoords(String dimension, int blockX, int blockZ, PartyInfo partyInfo, Player owner, PlayerRef playerRef) {
+        return this.claimChunkBy(dimension, ChunkUtil.chunkCoordinate(blockX), ChunkUtil.chunkCoordinate(blockZ), partyInfo, owner, playerRef);
     }
 
     public boolean hasEnoughClaimsLeft(PartyInfo partyInfo){
@@ -281,11 +277,11 @@ public class ClaimManager {
         return adminUsageParty;
     }
 
-    public void invitePlayerToParty(Player recipient, PartyInfo partyInfo, Player sender){
+    public void invitePlayerToParty(PlayerRef recipient, PartyInfo partyInfo, PlayerRef sender) {
         this.partyInvites.put(recipient.getUuid().toString(), new PartyInvite(recipient.getUuid(), sender.getUuid(), partyInfo.getId()));
     }
 
-    public PartyInvite acceptInvite(Player player){
+    public PartyInvite acceptInvite(PlayerRef player) {
         var invite = this.partyInvites.get(player.getUuid().toString());
         if (invite == null) return null;
         var party = this.getPartyById(invite.party());
@@ -295,7 +291,7 @@ public class ClaimManager {
         return invite;
     }
 
-    public void leaveParty(Player player, PartyInfo partyInfo){
+    public void leaveParty(PlayerRef player, PartyInfo partyInfo) {
         if (partyInfo.isOwner(player.getUuid())) {
             partyInfo.removeMember(player.getUuid());
             if (partyInfo.getMembers().length > 0) {

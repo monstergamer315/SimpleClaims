@@ -37,14 +37,14 @@ public class OpOverrideCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
                         var overridesList = ClaimManager.getInstance().getAdminClaimOverrides();
-                        if (overridesList.contains(player.getUuid().toString())) {
-                            overridesList.remove(player.getUuid().toString());
+                        if (overridesList.contains(playerRef.getUuid().toString())) {
+                            overridesList.remove(playerRef.getUuid().toString());
                             player.sendMessage(CommandMessages.DISABLED_OVERRIDE);
                         } else {
-                            overridesList.add(player.getUuid().toString());
+                            overridesList.add(playerRef.getUuid().toString());
                             player.sendMessage(CommandMessages.ENABLED_OVERRIDE);
                         }
                     }

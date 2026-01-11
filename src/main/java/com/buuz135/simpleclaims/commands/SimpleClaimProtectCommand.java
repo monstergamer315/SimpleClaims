@@ -14,6 +14,7 @@ import com.hypixel.hytale.server.core.command.system.CommandContext;
 import com.hypixel.hytale.server.core.command.system.CommandSender;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractAsyncCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
+import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -43,7 +44,8 @@ public class SimpleClaimProtectCommand extends AbstractAsyncCommand {
         CommandSender sender = commandContext.sender();
         if (sender instanceof Player player) {
             Ref<EntityStore> ref = player.getReference();
-            if (ref != null && ref.isValid()) {
+            PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+            if (ref != null && ref.isValid() && playerRef != null) {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
@@ -51,15 +53,13 @@ public class SimpleClaimProtectCommand extends AbstractAsyncCommand {
                         player.sendMessage(CommandMessages.CANT_CLAIM_IN_THIS_DIMENSION);
                         return;
                     }
-                    var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
                     if (party == null) {
-                        party = ClaimManager.getInstance().createParty(player);
+                        party = ClaimManager.getInstance().createParty(player, playerRef);
                         player.sendMessage(CommandMessages.PARTY_CREATED);
                     }
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        player.getPageManager().openCustomPage(ref, store, new ChunkInfoGui(playerRefComponent, player.getWorld().getName(), ChunkUtil.chunkCoordinate(player.getPosition().getX()), ChunkUtil.chunkCoordinate(player.getPosition().getZ()) ));
-                    }
+                    var position = store.getComponent(ref, TransformComponent.getComponentType());
+                    player.getPageManager().openCustomPage(ref, store, new ChunkInfoGui(playerRef, player.getWorld().getName(), ChunkUtil.chunkCoordinate(position.getPosition().getX()), ChunkUtil.chunkCoordinate(position.getPosition().getZ())));
                 }, world);
             } else {
                 commandContext.sendMessage(MESSAGE_COMMANDS_ERRORS_PLAYER_NOT_IN_WORLD);

@@ -44,16 +44,16 @@ public class OpCreatePartyCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
                     var commandName = commandContext.get(this.name);
-                    if (playerRefComponent != null) {
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    if (playerRef != null) {
+                        var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
 
-                        party = ClaimManager.getInstance().createParty(player);
+                        party = ClaimManager.getInstance().createParty(player, playerRef);
                         party.setName(commandName);
                         party.setOwner(UUID.randomUUID());
                         player.sendMessage(CommandMessages.PARTY_CREATED);
-                        player.getPageManager().openCustomPage(ref, store, new PartyInfoEditGui(playerRefComponent, party, true));
+                        player.getPageManager().openCustomPage(ref, store, new PartyInfoEditGui(playerRef, party, true));
                     }
                 }, world);
             } else {

@@ -39,9 +39,9 @@ public class OpPartyListCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        player.getPageManager().openCustomPage(ref, store, new PartyListGui(playerRefComponent));
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
+                        player.getPageManager().openCustomPage(ref, store, new PartyListGui(playerRef));
                     }
                 }, world);
             } else {

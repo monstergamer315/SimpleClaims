@@ -21,6 +21,7 @@ import com.hypixel.hytale.server.core.event.events.player.PlayerMouseButtonEvent
 import com.hypixel.hytale.server.core.plugin.JavaPlugin;
 import com.hypixel.hytale.server.core.plugin.JavaPluginInit;
 
+import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.events.AddWorldEvent;
 import com.hypixel.hytale.server.core.universe.world.events.RemoveWorldEvent;
@@ -31,6 +32,7 @@ import org.checkerframework.checker.nullness.compatqual.NonNullDecl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 
 public class Main extends JavaPlugin {
@@ -46,6 +48,7 @@ public class Main extends JavaPlugin {
     @Override
     protected void setup() {
         super.setup();
+        CONFIG.save();
 
         this.getEntityStoreRegistry().registerSystem(new BreakBlockEventSystem());
         this.getEntityStoreRegistry().registerSystem(new PlaceBlockEventSystem());
@@ -61,6 +64,7 @@ public class Main extends JavaPlugin {
 
         this.getEventRegistry().registerGlobal(AddWorldEvent.class, (event) -> {
             WORLDS.put(event.getWorld().getName(), event.getWorld());
+            this.getLogger().at(Level.INFO).log("Registered world: " + event.getWorld().getName());
 
             if (CONFIG.get().isForceSimpleClaimsChunkWorldMap() && !event.getWorld().getWorldConfig().isDeleteOnRemove()) event.getWorld().getWorldConfig().setWorldMapProvider(new SimpleClaimsWorldMapProvider());
         });
@@ -71,16 +75,11 @@ public class Main extends JavaPlugin {
 
         this.getEventRegistry().registerGlobal(AddPlayerToWorldEvent.class, (event) -> {
             var player = event.getHolder().getComponent(Player.getComponentType());
-            ClaimManager.getInstance().getPlayerNameTracker().setPlayerName(player.getUuid(), player.getDisplayName());
+            var playerRef = event.getHolder().getComponent(PlayerRef.getComponentType());
+            ClaimManager.getInstance().getPlayerNameTracker().setPlayerName(playerRef.getUuid(), player.getDisplayName());
             ClaimManager.getInstance().markDirty();
         });
 
-        this.getEventRegistry().register(EventPriority.EARLY, PlayerMouseButtonEvent.class, (event) -> {
-            System.out.println("PlayerMouseButtonEvent");
-            System.out.println(event.getItemInHand());
-            System.out.println(event.getMouseButton());
-            event.setCancelled(true);
-        });
     }
 
 }

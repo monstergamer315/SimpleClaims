@@ -42,9 +42,9 @@ public class OpModifyChunkAmountCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var selectedPartyID = ClaimManager.getInstance().getAdminUsageParty().getOrDefault(player.getUuid().toString(), null);
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
+                        var selectedPartyID = ClaimManager.getInstance().getAdminUsageParty().getOrDefault(playerRef.getUuid().toString(), null);
                         if (selectedPartyID == null) {
                             player.sendMessage(CommandMessages.ADMIN_PARTY_NOT_SELECTED);
                             return;

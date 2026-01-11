@@ -33,14 +33,14 @@ public class UnclaimChunkCommand extends AbstractAsyncCommand {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var party = ClaimManager.getInstance().getPartyFromPlayer(player);
+                    PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
+                    if (playerRef != null) {
+                        var party = ClaimManager.getInstance().getPartyFromPlayer(playerRef.getUuid());
                         if (party == null) {
                             player.sendMessage(CommandMessages.NOT_IN_A_PARTY);
                             return;
                         }
-                        var chunk = ClaimManager.getInstance().getChunkRawCoords(player.getWorld().getName(), (int) player.getPosition().getX(), (int) player.getPosition().getZ());
+                        var chunk = ClaimManager.getInstance().getChunkRawCoords(player.getWorld().getName(), (int) playerRef.getTransform().getPosition().getX(), (int) playerRef.getTransform().getPosition().getZ());
                         if (chunk == null) {
                             player.sendMessage(CommandMessages.NOT_CLAIMED);
                             return;
@@ -49,7 +49,7 @@ public class UnclaimChunkCommand extends AbstractAsyncCommand {
                             player.sendMessage(CommandMessages.NOT_YOUR_CLAIM);
                             return;
                         }
-                        ClaimManager.getInstance().unclaimRawCoords(player.getWorld().getName(), (int) player.getPosition().getX(), (int) player.getPosition().getZ());
+                        ClaimManager.getInstance().unclaimRawCoords(player.getWorld().getName(), (int) playerRef.getTransform().getPosition().getX(), (int) playerRef.getTransform().getPosition().getZ());
                         player.sendMessage(CommandMessages.UNCLAIMED);
                     }
                 }, world);

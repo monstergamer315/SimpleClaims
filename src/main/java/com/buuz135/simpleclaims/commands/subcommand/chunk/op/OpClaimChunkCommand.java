@@ -31,34 +31,32 @@ public class OpClaimChunkCommand extends AbstractAsyncCommand {
         CommandSender sender = commandContext.sender();
         if (sender instanceof Player player) {
             Ref<EntityStore> ref = player.getReference();
-            if (ref != null && ref.isValid()) {
+            PlayerRef playerRef = ref.getStore().getComponent(ref, PlayerRef.getComponentType());
+            if (ref != null && ref.isValid() && playerRef != null) {
                 Store<EntityStore> store = ref.getStore();
                 World world = store.getExternalData().getWorld();
                 return CompletableFuture.runAsync(() -> {
-                    PlayerRef playerRefComponent = store.getComponent(ref, PlayerRef.getComponentType());
-                    if (playerRefComponent != null) {
-                        var selectedPartyID = ClaimManager.getInstance().getAdminUsageParty().getOrDefault(player.getUuid().toString(), null);
-                        if (selectedPartyID == null) {
-                            player.sendMessage(CommandMessages.ADMIN_PARTY_NOT_SELECTED);
-                            return;
-                        }
-                        var party = ClaimManager.getInstance().getPartyById(selectedPartyID);
-                        if (party == null) {
-                            player.sendMessage(CommandMessages.PARTY_NOT_FOUND);
-                            return;
-                        }
-                        var chunk = ClaimManager.getInstance().getChunkRawCoords(player.getWorld().getName(), (int) player.getPosition().getX(), (int) player.getPosition().getZ());
-                        if (chunk != null) {
-                            player.sendMessage(chunk.getPartyOwner().equals(party.getId()) ? CommandMessages.ALREADY_CLAIMED_BY_YOU : CommandMessages.ALREADY_CLAIMED_BY_ANOTHER_PLAYER);
-                            return;
-                        }
-                        if (!ClaimManager.getInstance().hasEnoughClaimsLeft(party)) {
-                            player.sendMessage(CommandMessages.NOT_ENOUGH_CHUNKS);
-                            return;
-                        }
-                        var chunkInfo = ClaimManager.getInstance().claimChunkByRawCoords(player.getWorld().getName(), (int) player.getPosition().getX(), (int) player.getPosition().getZ(), party, player);
-                        player.sendMessage(CommandMessages.CLAIMED);
+                    var selectedPartyID = ClaimManager.getInstance().getAdminUsageParty().getOrDefault(playerRef.getUuid().toString(), null);
+                    if (selectedPartyID == null) {
+                        player.sendMessage(CommandMessages.ADMIN_PARTY_NOT_SELECTED);
+                        return;
                     }
+                    var party = ClaimManager.getInstance().getPartyById(selectedPartyID);
+                    if (party == null) {
+                        player.sendMessage(CommandMessages.PARTY_NOT_FOUND);
+                        return;
+                    }
+                    var chunk = ClaimManager.getInstance().getChunkRawCoords(player.getWorld().getName(), (int) playerRef.getTransform().getPosition().getX(), (int) playerRef.getTransform().getPosition().getZ());
+                    if (chunk != null) {
+                        player.sendMessage(chunk.getPartyOwner().equals(party.getId()) ? CommandMessages.ALREADY_CLAIMED_BY_YOU : CommandMessages.ALREADY_CLAIMED_BY_ANOTHER_PLAYER);
+                        return;
+                    }
+                    if (!ClaimManager.getInstance().hasEnoughClaimsLeft(party)) {
+                        player.sendMessage(CommandMessages.NOT_ENOUGH_CHUNKS);
+                        return;
+                    }
+                    var chunkInfo = ClaimManager.getInstance().claimChunkByRawCoords(player.getWorld().getName(), (int) playerRef.getTransform().getPosition().getX(), (int) playerRef.getTransform().getPosition().getZ(), party, player, playerRef);
+                    player.sendMessage(CommandMessages.CLAIMED);
                 }, world);
             } else {
                 commandContext.sendMessage(MESSAGE_COMMANDS_ERRORS_PLAYER_NOT_IN_WORLD);

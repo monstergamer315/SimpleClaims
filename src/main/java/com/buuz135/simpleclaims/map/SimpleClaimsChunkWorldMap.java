@@ -27,17 +27,17 @@ public class SimpleClaimsChunkWorldMap implements IWorldMap {
     }
 
     @Override
-    public CompletableFuture<WorldMap> generate(World world,  int imageWidth, int imageHeight, LongSet chunksToGenerate) {
+    public CompletableFuture<WorldMap> generate(World world, int imageWidth, int imageHeight, LongSet chunksToGenerate) {
         CompletableFuture<CustomImageBuilder>[] futures = new CompletableFuture[chunksToGenerate.size()];
         int futureIndex = 0;
 
-        for(LongIterator iterator = chunksToGenerate.iterator(); iterator.hasNext(); futures[futureIndex++] = CustomImageBuilder.build(iterator.nextLong(), imageWidth, imageHeight, world)) {
+        for (LongIterator iterator = chunksToGenerate.iterator(); iterator.hasNext(); futures[futureIndex++] = CustomImageBuilder.build(iterator.nextLong(), imageWidth, imageHeight, world)) {
         }
 
         return CompletableFuture.allOf(futures).thenApply((unused) -> {
             WorldMap worldMap = new WorldMap(futures.length);
 
-            for(int i = 0; i < futures.length; ++i) {
+            for (int i = 0; i < futures.length; ++i) {
                 CustomImageBuilder builder = futures[i].getNow(null);
                 if (builder != null) {
                     worldMap.getChunks().put(builder.getIndex(), builder.getImage());

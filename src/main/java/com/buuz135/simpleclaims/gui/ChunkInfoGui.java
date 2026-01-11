@@ -62,7 +62,7 @@ public class ChunkInfoGui extends InteractiveCustomUIPage<ChunkInfoGui.ChunkInfo
                 }
                 var chunk = ClaimManager.getInstance().getChunk(dimension, x, z);
                 if (chunk == null && ClaimManager.getInstance().hasEnoughClaimsLeft(playerParty)) {
-                    var chunkInfo = ClaimManager.getInstance().claimChunkBy(dimension, x, z, playerParty, playerInstance);
+                    var chunkInfo = ClaimManager.getInstance().claimChunkBy(dimension, x, z, playerParty, playerInstance, playerRef);
                     ClaimManager.getInstance().markDirty();
                 }
             }
