@@ -70,7 +70,6 @@ public class ClaimManager {
             logger.at(Level.INFO).log("Loading party data...");
             this.partyBlockingFile.syncLoad();
             for (PartyInfo party : this.partyBlockingFile.getParties().values()) {
-                System.out.println(party);
                 for (UUID member : party.getMembers()) {
                     playerToParty.put(member, party.getId());
                 }
