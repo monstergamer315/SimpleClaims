@@ -29,9 +29,9 @@ def hytaleServerJar
 if (os.isWindows()) {
     hytaleHome = "$userHome/AppData/Roaming/Hytale"
 } else if (os.isMacOsX()) {
-    hytaleHome = "$userHome/Library/Application Support/"
+    hytaleHome = "$userHome/Library/Application Support/Hytale"
 } else if (os.isLinux()) {
-    hytaleHome = "$userHome/.local/share/"
+    hytaleHome = "$userHome/.local/share/Hytale"
 } else {
     throw new GradleException("Unsupported OS for Hytale")
 }
