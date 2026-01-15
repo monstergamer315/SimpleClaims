@@ -24,6 +24,7 @@ import javax.annotation.Nullable;
 import java.awt.*;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.logging.Level;
@@ -36,7 +37,7 @@ public class ClaimManager {
     private final Map<UUID, PartyInvite> partyInvites;
     private final Map<UUID, UUID> playerToParty;
     private final Map<UUID, Integer> partyClaimCounts;
-    private boolean needsMapUpdate;
+    private Set<String> worldsNeedingUpdates;
     private boolean isDirty;
     private Thread savingThread;
     private HytaleLogger logger = HytaleLogger.getLogger().getSubLogger("SimpleClaims");
@@ -52,7 +53,7 @@ public class ClaimManager {
 
     private ClaimManager() {
         this.adminUsageParty = new ConcurrentHashMap<>();
-        this.needsMapUpdate = false;
+        this.worldsNeedingUpdates = new HashSet<>();
         this.isDirty = false;
         this.partyInvites = new ConcurrentHashMap<>();
         this.playerToParty = new ConcurrentHashMap<>();
@@ -167,7 +168,6 @@ public class ClaimManager {
 
     public void markDirty() {
         this.isDirty = true;
-        setNeedsMapUpdate(true);
     }
 
     public void addParty(PartyInfo partyInfo){
@@ -269,12 +269,12 @@ public class ClaimManager {
         this.unclaim(dimension, ChunkUtil.chunkCoordinate(blockX), ChunkUtil.chunkCoordinate(blockZ));
     }
 
-    public boolean needsMapUpdate() {
-        return needsMapUpdate;
+    public Set<String> getWorldsNeedingUpdates() {
+        return worldsNeedingUpdates;
     }
 
-    public void setNeedsMapUpdate(boolean needsMapUpdate) {
-        this.needsMapUpdate = needsMapUpdate;
+    public void setNeedsMapUpdate(String world) {
+        this.worldsNeedingUpdates.add(world);
     }
 
     public PlayerNameTracker getPlayerNameTracker() {
@@ -365,7 +365,7 @@ public class ClaimManager {
         mapUpdateQueue.get(world.getName()).add(ChunkUtil.indexChunk(chunkX - 1, chunkZ));
         mapUpdateQueue.get(world.getName()).add(ChunkUtil.indexChunk(chunkX, chunkZ + 1));
         mapUpdateQueue.get(world.getName()).add(ChunkUtil.indexChunk(chunkX, chunkZ - 1));
-        this.setNeedsMapUpdate(true);
+        this.setNeedsMapUpdate(world.getName());
     }
 
     public HashMap<String, LongSet> getMapUpdateQueue() {
