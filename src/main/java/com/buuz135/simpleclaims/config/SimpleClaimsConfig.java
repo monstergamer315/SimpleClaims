@@ -110,6 +110,9 @@ public class SimpleClaimsConfig {
             .append(new KeyedCodec<Integer>("MaxPartyAllies", Codec.INTEGER),
                     (simpleClaimsConfig, value, extraInfo) -> simpleClaimsConfig.MaxPartyAllies = value,
                     (simpleClaimsConfig, extraInfo) -> simpleClaimsConfig.MaxPartyAllies).add()
+            .append(new KeyedCodec<Boolean>("RenderClaimNamesOnWorldMap", Codec.BOOLEAN),
+                    (simpleClaimsConfig, value, extraInfo) -> simpleClaimsConfig.RenderClaimNamesOnWorldMap = value,
+                    (simpleClaimsConfig, extraInfo) -> simpleClaimsConfig.RenderClaimNamesOnWorldMap).add()
             .build();
 
     private int DefaultPartyClaimsAmount = 25;
@@ -144,6 +147,7 @@ public class SimpleClaimsConfig {
     private String[] FullWorldProtection = new String[0];
     private boolean EnableAlloyEntryTesting = false;
     private boolean EnableParticleBorders = true;
+    private boolean RenderClaimNamesOnWorldMap = false;
 
     private boolean ForceSimpleClaimsChunkWorldMap = true;
     private boolean CreativeModeBypassProtection = false;
@@ -284,5 +288,9 @@ public class SimpleClaimsConfig {
 
     public int getMaxPartyAllies() {
         return MaxPartyAllies;
+    }
+
+    public boolean isRenderClaimNamesOnWorldMap() {
+        return RenderClaimNamesOnWorldMap;
     }
 }

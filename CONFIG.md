@@ -80,6 +80,8 @@ Settings related to the user interface and visual feedback.
   claimed chunks.
 - **ForceSimpleClaimsChunkWorldMap** (Boolean, Default: `true`): If `true`, forces the use of the Simple Claims chunk
   map.
+- **RenderClaimNamesOnWorldMap** (Boolean, Default: `false`): If `true`, the name of the party that owns a chunk and a
+  colored border will be rendered directly on the world map.
 
 ## Experimental Settings
 

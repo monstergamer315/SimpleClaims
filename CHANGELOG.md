@@ -13,6 +13,7 @@
 * Added an option to remove pvp between party members (Friendly Fire), closes #23
 * Added a config option to limit how many party member and allies can a party have closes #20
 * Improved map so less detail is lost in claimed chunks
+* Added a config option to show the claim name on the map, disabled by default, closes #60
 
 # 1.0.14
 
