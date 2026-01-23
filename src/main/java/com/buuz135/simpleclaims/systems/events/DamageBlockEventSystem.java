@@ -34,7 +34,6 @@ public class DamageBlockEventSystem extends EntityEventSystem<EntityStore, Damag
 
     @Override
     public void handle(final int index, @Nonnull final ArchetypeChunk<EntityStore> archetypeChunk, @Nonnull final Store<EntityStore> store, @Nonnull final CommandBuffer<EntityStore> commandBuffer, @Nonnull final DamageBlockEvent event) {
-        println("here DamageBlock with query any");
         Ref<EntityStore> ref = archetypeChunk.getReferenceTo(index);
         Player player = store.getComponent(ref, Player.getComponentType());
         PlayerRef playerRef = store.getComponent(ref, PlayerRef.getComponentType());
@@ -46,9 +45,7 @@ public class DamageBlockEventSystem extends EntityEventSystem<EntityStore, Damag
     @Nullable
     @Override
     public Query<EntityStore> getQuery() {
-        return Query.any();
-        // normally this, but using Query.any() to try to capture the explosion block break/damage events (doesn't work)
-        // return PlayerRef.getComponentType();
+        return PlayerRef.getComponentType();
     }
 
     @NonNullDecl
