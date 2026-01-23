@@ -88,4 +88,5 @@ Some permissions are dynamic and require a value to be appended to the end of th
 - `simpleclaims.party.claim_chunk_amount.<amount>`: Sets the maximum amount of chunks a player's party can claim. For
   example, to allow a player to claim 50 chunks, you would grant the permission
   `simpleclaims.party.claim_chunk_amount.50`. If a player has multiple permissions of this type, the highest value will
-  be used. In this case only the party owner is checked for this permission
+  be used. In this case only the party owner is checked for this permission. **THE COMMAND TO CHANGE THE AMOUNT OF
+  CHUNKS FOR A PARTY WILL TAKE PREFERENCE WHEN CALCULATING THE AMOUNT OF CHUNKS**

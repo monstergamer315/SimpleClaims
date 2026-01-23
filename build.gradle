@@ -62,7 +62,7 @@ dependencies {
     shadowBundle 'org.slf4j:slf4j-simple:2.0.17'
     shadowBundle 'org.xerial:sqlite-jdbc:3.45.1.0'
     compileOnly 'net.luckperms:api:5.4'
-    runtimeOnly(files("./run/LuckPerms-Hytale-5.5.25-beta10.jar"))
+    //runtimeOnly(files("./run/LuckPerms-Hytale-5.5.25-beta10.jar"))
 }
 
 test {

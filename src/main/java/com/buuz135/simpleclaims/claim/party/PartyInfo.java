@@ -126,12 +126,12 @@ public class PartyInfo {
     }
 
     public int getMaxClaimAmount(){
-        var amount = Permissions.getPermissionClaimAmount(owner);
-        if (amount != -1) return amount;
         var override = this.getOverride(PartyOverrides.CLAIM_CHUNK_AMOUNT);
         if (override != null) {
             return (Integer) override.getValue().getTypedValue();
         }
+        var amount = Permissions.getPermissionClaimAmount(owner);
+        if (amount != -1) return amount;
         return Main.CONFIG.get().getDefaultPartyClaimsAmount();
     }
 
