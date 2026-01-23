@@ -10,10 +10,8 @@ import com.buuz135.simpleclaims.interactions.ClaimPlaceBucketInteraction;
 import com.buuz135.simpleclaims.interactions.ClaimUseBlockInteraction;
 import com.buuz135.simpleclaims.map.SimpleClaimsWorldMapProvider;
 import com.buuz135.simpleclaims.systems.events.*;
-import com.buuz135.simpleclaims.systems.tick.ChunkBordersTickingSystem;
-import com.buuz135.simpleclaims.systems.tick.EntryTickingSystem;
+import com.buuz135.simpleclaims.systems.tick.*;
 import com.buuz135.simpleclaims.util.PartyInactivityThread;
-import com.buuz135.simpleclaims.systems.tick.TitleTickingSystem;
 
 import com.buuz135.simpleclaims.systems.tick.WorldMapUpdateTickingSystem;
 import com.buuz135.simpleclaims.util.Permissions;
@@ -60,6 +58,7 @@ public class Main extends JavaPlugin {
         if (CONFIG.get().isEnableParticleBorders())
             this.getEntityStoreRegistry().registerSystem(new ChunkBordersTickingSystem());
         this.getEntityStoreRegistry().registerSystem(new CustomDamageEventSystem());
+        this.getEntityStoreRegistry().registerSystem(new QueuedCraftClaimFilterSystem());
 
         // Register global (world-level) event systems for block damage. Allows us to block custom item interactions from damaging claims.
         this.getEntityStoreRegistry().registerSystem(new GlobalDamageBlockEventSystem());
