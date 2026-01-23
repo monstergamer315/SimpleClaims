@@ -1,3 +1,8 @@
+# 1.0.21
+
+* Fixed database not being created properly on first run, closes #130
+* Fixed not being able to use the builders workbench closes #129
+
 # 1.0.20
 
 * World map now shows in the claim chunks GUI - ThatGravyBoat

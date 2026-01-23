@@ -30,6 +30,7 @@ public class DatabaseManager {
         } catch (Exception e) {
             logger.at(Level.SEVERE).log("Couldn't find relocated JDBC driver for SQLite");
         }
+        FileUtils.ensureMainDirectory();
         try {
             this.connection = DriverManager.getConnection("jdbc:sqlite:" + FileUtils.DATABASE_PATH);
             try (Statement statement = connection.createStatement()) {
