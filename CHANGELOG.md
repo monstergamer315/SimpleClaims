@@ -6,6 +6,7 @@
 * Fix coordinate rounding error for negative values due to narrowing casts - XAgent1990
 * Added claim amount permission, more info in CONFIG.md, closes #66
 * Fixed Admin Claiming Gui not working properly, closes #125
+* Removing saving thread to avoid sometimes not saving data in big environments, closes #119 closes #97
 
 # 1.0.19
 

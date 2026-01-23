@@ -70,14 +70,12 @@ public class ChunkInfoGui extends InteractiveCustomUIPage<ChunkInfoGui.ChunkInfo
                     if (chunk == null && selectedParty != null && ClaimManager.getInstance().hasEnoughClaimsLeft(selectedParty)) {
                         var chunkInfo = ClaimManager.getInstance().claimChunkBy(dimension, x, z, selectedParty, playerInstance, playerRef);
                         ClaimManager.getInstance().queueMapUpdate(playerInstance.getWorld(), x, z);
-                        ClaimManager.getInstance().markDirty();
                     }
                 } else {
                     var chunk = ClaimManager.getInstance().getChunk(dimension, x, z);
                     if (chunk == null && ClaimManager.getInstance().hasEnoughClaimsLeft(playerParty)) {
                         var chunkInfo = ClaimManager.getInstance().claimChunkBy(dimension, x, z, playerParty, playerInstance, playerRef);
                         ClaimManager.getInstance().queueMapUpdate(playerInstance.getWorld(), x, z);
-                        ClaimManager.getInstance().markDirty();
                     }
                 }
             }
@@ -93,14 +91,12 @@ public class ChunkInfoGui extends InteractiveCustomUIPage<ChunkInfoGui.ChunkInfo
                     if (chunk != null && selectedPartyID.equals(chunk.getPartyOwner())) {
                         ClaimManager.getInstance().unclaim(dimension, x, z);
                         ClaimManager.getInstance().queueMapUpdate(playerInstance.getWorld(), x, z);
-                        ClaimManager.getInstance().markDirty();
                     }
                 } else {
                     var chunk = ClaimManager.getInstance().getChunk(dimension, x, z);
                     if (chunk != null && chunk.getPartyOwner().equals(playerParty.getId())) {
                         ClaimManager.getInstance().unclaim(dimension, x, z);
                         ClaimManager.getInstance().queueMapUpdate(playerInstance.getWorld(), x, z);
-                        ClaimManager.getInstance().markDirty();
                     }
                 }
             }
