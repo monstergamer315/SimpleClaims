@@ -1,3 +1,7 @@
+# 1.0.23
+
+* Fixed Bucket & Watering Can interaction not working properly, closes #140
+
 # 1.0.22
 
 * Updated mod to game update 24-01-2026, closes #137
