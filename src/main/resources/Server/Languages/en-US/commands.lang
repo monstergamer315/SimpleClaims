@@ -32,3 +32,4 @@ simpleclaims.activatedPartyChat = Party chat is activated
 simpleclaims.deactivatedPartyChat = Party chat is deactivated
 simpleclaims.playerActivatedPartyChat = {player} has activated the party chat
 simpleclaims.playerDeactivatedPartyChat = {player} has deactivated the party chat
+simpleclaims.partyTag = [PARTY]

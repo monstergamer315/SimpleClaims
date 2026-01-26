@@ -1,6 +1,7 @@
 package com.buuz135.simpleclaims.chat;
 
 import com.buuz135.simpleclaims.claim.ClaimManager;
+import com.hypixel.hytale.server.core.Message;
 import com.hypixel.hytale.server.core.event.events.player.PlayerChatEvent;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.Universe;
@@ -24,9 +25,9 @@ public class PlayerChatListener implements Function<CompletableFuture<PlayerChat
             final var partyInfo = ClaimManager.getInstance().getPartyFromPlayer(sender.getUuid());
             if (partyInfo == null) return event;
 
-            final var content = event.getContent();
-            final var partyName = partyInfo.getName();
-            event.setContent("[" + partyName + "] " + content);
+            event.setFormatter((playerRef, s) -> {
+                return Message.join(Message.translation("commands.simpleclaims.partyTag").color("#d4be6e").bold(true), Message.raw(" " + playerRef.getUsername() + ": "), Message.raw(s));
+            });
 
             final var members = ClaimManager.getInstance().getParties().get(partyInfo.getId().toString()).getMembers();
             final List<PlayerRef> targets = new ArrayList<>();
